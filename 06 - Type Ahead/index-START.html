@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Type Ahead 👀</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <form class="search-form">
+    <input type="text" class="search" placeholder="City or State">
+    <ul class="suggestions">
+      <li>Filter for a city</li>
+      <li>or a state</li>
+    </ul>
+  </form>
+<script>
+    const endpoint = 'https://gist.githubusercontent.com/Miserlou/c5cd8364bf9b2420bb29/raw/2bf258763cdddd704f8ffd3ea9a3e81d25e2c6f6/cities.json';
+    const searchBox = document.querySelector('.search-form')
+    const suggestions = document.querySelector('.suggestions')
+    const cities =  [];
+    
+    fetch(endpoint)
+    .then(response => {return response.json()})
+    .catch(function (err) {
+    })
+    .then(response => {
+      cities.push(...response)
+    })
+
+    function updateDOM(newCities, input) {
+      suggestions.innerHTML = '';
+      if (input === '') {
+        return
+      }
+      const tempDOM = document.createDocumentFragment();
+      newCities.forEach(city => {
+        console.log(input)
+        const regex = new RegExp(input, 'gi')
+        const li = document.createElement('li');
+        const cityName = city.city.replace(regex, `<span class='hl'>${regex.source}</span>`)
+        const state = city.state.replace(regex, `<span class='hl'>${regex.source}</span>`)
+        const pop = city.population;
+        li.innerHTML= `<p>${cityName}, ${state}</p><p><span class="population">${pop}</span><p>`
+        tempDOM.appendChild(li);
+      })
+      suggestions.appendChild(tempDOM)
+    }
+
+    function handleInput(e) {
+      const inputValue = e.target.value;
+      const matchedCities = cities.filter(city => {
+        return city.city.toLowerCase().includes(inputValue.toLowerCase()) || city.state.includes(inputValue)
+        })
+      updateDOM(matchedCities, inputValue)
+    }
+
+    searchBox.addEventListener('input', handleInput)
+</script>
+</body>
+</html>
