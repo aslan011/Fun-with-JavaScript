@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>HTML5 Canvas</title>
+  <link href="https://fonts.googleapis.com/css2?family=Piedra&display=swap" rel="stylesheet"> 
+</head>
+<body>
+<canvas id="draw" width="800" height="800"></canvas>
+<script>
+  const canvas = document.getElementById('draw');
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+
+  const ctx = canvas.getContext('2d');
+  let hue = 0;
+  ctx.lineJoin = 'round';
+  ctx.lineCap = 'round';
+  ctx.lineWidth = 50;
+  ctx.font="100px Piedra, cursive";
+  ctx.fillText("JavaScript paint canvas", 500, 300);
+  ctx.fillText("Start painting!", 700, 500);
+
+  let drawing = false;
+  let lastX = 0;
+  let lastY = 0;
+
+  let direction = true;
+
+function draw(e) {
+  if (!drawing) {return}  //if drawing is false
+  if (hue >= 360) {hue = 0}
+  ctx.strokeStyle = `hsl(${hue}, 100%, 50%)`;
+  hue++
+  console.log(hue)
+  if (ctx.lineWidth >= 100 || ctx.lineWidth <= 1) {
+    direction = !direction
+  }
+  ctx.beginPath();
+  if (direction) {
+    ctx.lineWidth++
+  } else { ctx.lineWidth--}
+  ctx.moveTo(lastX, lastY);
+  ctx.lineTo(e.clientX, e.clientY);
+  ctx.stroke();
+  [lastX, lastY] = [e.clientX, e.clientY]; //destructing 
+}
+
+canvas.addEventListener('mousedown', (e) => { 
+  drawing = true;
+  [lastX, lastY] = [e.clientX, e.clientY];
+  draw(e);
+})
+canvas.addEventListener('mousemove', draw);
+canvas.addEventListener('mouseup', () => { drawing = false });
+</script>
+
+<style>
+  html, body {
+    margin: 0;
+  }
+
+  #title {
+    z-index: 5;
+    color: blue;
+  }
+
+</style>
+
+</body>
+</html>
